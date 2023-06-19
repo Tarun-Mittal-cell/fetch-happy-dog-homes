@@ -1,3 +1,5 @@
+// useSearch.tsx
+
 import { useState, useEffect } from "react";
 import { useRecoilState } from "recoil";
 import axios from "axios";
@@ -8,9 +10,9 @@ export const useSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dogs, setDogs] = useRecoilState(dogsState);
   const [breeds, setBreeds] = useRecoilState(breedState);
-  // const [zipCodes, setZipCodes] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [dogsPerPage] = useState(10);
   const [selectedBreed, setSelectedBreed] = useState("");
-  // const [selectedZipCode, setSelectedZipCode] = useState('');
   
   useEffect(() => {
     const fetchDogs = async () => {
@@ -30,7 +32,7 @@ export const useSearch = () => {
       })) as any;
 
       const dogsZipCodes = dogs?.data.map((dog: any) => dog.zip_code);
-      debugger;
+
       const locations = (await axios({
         method: "POST",
         url: "https://frontend-take-home-service.fetch.com/locations",
@@ -42,7 +44,7 @@ export const useSearch = () => {
       const mappedDogs = dogs.data.map((dog: any) => {
         return {
           ...dog,
-          location: locations.data[idx],
+          location: locations.data[idx++],
           isFavorite: false,
         };
       });
@@ -54,39 +56,25 @@ export const useSearch = () => {
       });
     };
 
-    //   setDogs(dogs?.data || []);
-    // };
-    // /dogs
     const fetchBreedsAndZipCodes = async () => {
       const breeds = await axios({
         method: "GET",
         url: "https://frontend-take-home-service.fetch.com/dogs/breeds",
         withCredentials: true,
       });
-      // const zipcodes = async () => {
-      //   const res = await axios({
-      //     method: "GET",
-      //     url: "https://frontend-take-home-service.fetch.com//locations/search",
-      //     withCredentials: true,
-      //   });
-      // };
 
       setBreeds(breeds?.data || []);
-      // setZipCodes(zipCodesResponse);
     };
+
     fetchDogs();
     fetchBreedsAndZipCodes();
   }, []);
 
   const handleSearch = (_searchTerm: string) => {
-    // const searchResponse = await searchDogs({ breeds: [selectedBreed], zipCodes: [selectedZipCode] });
-    // const searchResponse = await searchDogs(selectedBreed);
-    // console.log(searchResponse); // Do something with search results
-
     const searchResult = matchSorter(dogs.fullList, _searchTerm, {
       keys: ["name", "breed", "location.city"],
     });
-    console.log(searchResult);
+
     if (searchResult?.length) {
       setDogs({ ...dogs, shownList: searchResult || [] });
     }
@@ -97,7 +85,7 @@ export const useSearch = () => {
   }, [searchTerm]);
 
   const sortResults = (direction: string) => {
-    const listToSort = [...dogs.shownList];  // create a copy of the array
+    const listToSort = [...dogs.shownList]; 
 
     listToSort.sort((a, b) => {
         let ageDifference = direction === 'asc' ? a.age - b.age : b.age - a.age;
@@ -121,26 +109,33 @@ export const useSearch = () => {
         return a.location.city.localeCompare(b.location.city);
     });
 
-    setDogs({ ...dogs, shownList: listToSort });  // update the state with the sorted list
-};
-  
+    setDogs({ ...dogs, shownList: listToSort });
+  };
 
   const toggleFavorite = (id: string, isFavorite: boolean) => {
     let dog = dogs.shownList.find((item: any) => id === item.id);
     dog = { ...dog, isFavorite };
     const idx = dogs.shownList.findIndex((item: any) => id === item.id);
-    // const updatedShowList = [...dogs.shownList, dog];
 
     const updatedDogs = [
       ...dogs.shownList.slice(0, idx),
       { ...dogs.shownList[idx], isFavorite },
       ...dogs.shownList.slice(idx + 1),
     ];
+
     setDogs({ ...dogs, shownList: updatedDogs || [] });
   };
 
+  // Get current dogs
+  const indexOfLastDog = currentPage * dogsPerPage;
+  const indexOfFirstDog = indexOfLastDog - dogsPerPage;
+  const currentDogs = dogs.shownList.slice(indexOfFirstDog, indexOfLastDog);
+
+  // Change page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
   return {
-    dogs: dogs.shownList,
+    dogs: currentDogs,
     breeds,
     handleSearch,
     selectedBreed,
@@ -148,5 +143,8 @@ export const useSearch = () => {
     setSearchTerm,
     sortResults,
     toggleFavorite,
+    dogsPerPage,
+    totalDogs: dogs.shownList.length,
+    paginate
   };
 };
