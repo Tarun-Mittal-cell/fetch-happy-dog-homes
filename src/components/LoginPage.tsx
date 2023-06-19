@@ -1,12 +1,15 @@
 import React, { useState, useContext } from 'react';
 import api from '../api';
 import { UserContext } from '../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { setUser } = useContext(UserContext);
     const [name, setName] = useState('')
+
+    const navigate = useNavigate();
     
     const onSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -15,14 +18,16 @@ const LoginPage: React.FC = () => {
             if (response.status === 200) {
                 setUser(response.data.user);
                 console.log('User logged in ===', response);
+                navigate("/dogs")
             } else {
                 console.error('Login failed');
+                setUser({ email, name })
             }
         } catch (error) {
             console.error('An error occurred while logging in', error);
         }
     };
-
+    
     return (
         <form onSubmit={onSubmit}>
             <label>

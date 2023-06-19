@@ -18,3 +18,37 @@ export const getDogs = async (dogIds: string[]) => {
     });
     return response.data;
 };
+
+export const getBreeds = async () => {
+    try {
+        const response = await axios.get('https://frontend-take-home-service.fetch.com/dogs/breeds');
+        if (response.status === 200) {
+            return response.data;  
+        }
+        throw new Error(`Failed to fetch breeds: ${response.statusText}`);
+    } catch (error) {
+        console.error('An error occurred while fetching breeds', error);
+        throw error;
+    }
+};
+
+// export const searchDogs = async (breeds: string[], zipCodes: string[], ageMin: number, ageMax: number) => {
+//     try {
+//         const response = await axios.get('/dogs/search', {
+//             params: {
+//                 breeds,
+//                 zipCodes,
+//                 ageMin,
+//                 ageMax,
+//             },
+//         });
+
+//         if (response.status === 200) {
+//             return response.data.resultIds;  // Assuming the API returns the resultIds in data
+//         }
+//         throw new Error(`Failed to search dogs: ${response.statusText}`);
+//     } catch (error) {
+//         console.error('An error occurred while searching dogs', error);
+//         throw error;
+//     }
+// };
