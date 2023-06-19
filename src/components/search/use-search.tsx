@@ -11,7 +11,7 @@ export const useSearch = () => {
   // const [zipCodes, setZipCodes] = useState<string[]>([]);
   const [selectedBreed, setSelectedBreed] = useState("");
   // const [selectedZipCode, setSelectedZipCode] = useState('');
-
+  
   useEffect(() => {
     const fetchDogs = async () => {
       const dogsSearch = (await axios({
@@ -97,30 +97,33 @@ export const useSearch = () => {
   }, [searchTerm]);
 
   const sortResults = (direction: string) => {
-    console.log({ list: dogs?.shownList });
-    let sortedByAgeNameBreedCity = dogs?.shownList?.sort((a, b) => {
-      let ageDifference = a.age - b.age;
-      debugger;
-      if (ageDifference !== 0) {
-        return ageDifference;
-      }
+    const listToSort = [...dogs.shownList];  // create a copy of the array
 
-      let nameDifference = a.name.localeCompare(b.name);
+    listToSort.sort((a, b) => {
+        let ageDifference = direction === 'asc' ? a.age - b.age : b.age - a.age;
 
-      if (nameDifference !== 0) {
-        return nameDifference;
-      }
+        if (ageDifference !== 0) {
+            return ageDifference;
+        }
 
-      let breedDifference = a.breed.localeCompare(b.breed);
+        let nameDifference = a.name.localeCompare(b.name);
 
-      if (breedDifference !== 0) {
-        return breedDifference;
-      }
+        if (nameDifference !== 0) {
+            return nameDifference;
+        }
 
-      return a.location.city.localeCompare(b.location.city);
+        let breedDifference = a.breed.localeCompare(b.breed);
+
+        if (breedDifference !== 0) {
+            return breedDifference;
+        }
+
+        return a.location.city.localeCompare(b.location.city);
     });
-    return sortedByAgeNameBreedCity;
-  };
+
+    setDogs({ ...dogs, shownList: listToSort });  // update the state with the sorted list
+};
+  
 
   const toggleFavorite = (id: string, isFavorite: boolean) => {
     let dog = dogs.shownList.find((item: any) => id === item.id);
