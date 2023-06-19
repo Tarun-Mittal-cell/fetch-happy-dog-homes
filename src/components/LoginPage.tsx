@@ -1,30 +1,36 @@
 import React, { useContext, useState } from 'react';
+import { login } from '../api/auth';
 import { UserContext } from '../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
-    // Local state for input fields
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
+    const { setUser } = useContext(UserContext);
+    const navigate = useNavigate();
 
-    // Get the login function from UserContext
-    const userContext = useContext(UserContext);
-    
-    // On form submission
-    const onSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        // If userContext is defined, call the login function
-        userContext?.login(name, email);
-    }
-    
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        try {
+            const response = await login(email, password);
+            setUser(response.data); 
+            navigate('/dogs'); 
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
-        <form onSubmit={onSubmit}>
-            <label>
-                Name:
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-            </label>
+        <form onSubmit={handleSubmit}>
             <label>
                 Email:
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </label>
+            <label>
+                Password:
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </label>
             <button type="submit">Log in</button>
         </form>
