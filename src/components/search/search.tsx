@@ -9,6 +9,8 @@ export const Search = () => {
     selectedBreed,
     setSelectedBreed,
     setSearchTerm,
+    sortResults,
+    toggleFavorite,
   } = useSearch();
 
   return (
@@ -30,8 +32,10 @@ export const Search = () => {
         ))}
       </select>
 
-      {/* <button onClick={handleSearch}>Search</button> */}
-
+      <>
+        <button onClick={() => sortResults("asc")}>Sort asc</button>
+        <button onClick={() => sortResults("desc")}>Sort desc</button>
+      </>
       <div className="dogs-container">
         {dogs.map((dog, $index) => {
           return (
@@ -52,6 +56,11 @@ export const Search = () => {
               </div>
               <div className="dog-zipcode-container">
                 <div className="dog-zipcode">{dog.zip_code}</div>
+              </div>
+              <div>
+                <button onClick={() => toggleFavorite(dog.id, !dog.isFavorite)}>
+                  {dog.isFavorite ? "Favorite dog" : "Not a favor"}
+                </button>
               </div>
             </div>
           );

@@ -43,6 +43,7 @@ export const useSearch = () => {
         return {
           ...dog,
           location: locations.data[idx],
+          isFavorite: false,
         };
       });
 
@@ -95,6 +96,46 @@ export const useSearch = () => {
     handleSearch(searchTerm);
   }, [searchTerm]);
 
+  const sortResults = (direction: string) => {
+    console.log({ list: dogs?.shownList });
+    let sortedByAgeNameBreedCity = dogs?.shownList?.sort((a, b) => {
+      let ageDifference = a.age - b.age;
+      debugger;
+      if (ageDifference !== 0) {
+        return ageDifference;
+      }
+
+      let nameDifference = a.name.localeCompare(b.name);
+
+      if (nameDifference !== 0) {
+        return nameDifference;
+      }
+
+      let breedDifference = a.breed.localeCompare(b.breed);
+
+      if (breedDifference !== 0) {
+        return breedDifference;
+      }
+
+      return a.location.city.localeCompare(b.location.city);
+    });
+    return sortedByAgeNameBreedCity;
+  };
+
+  const toggleFavorite = (id: string, isFavorite: boolean) => {
+    let dog = dogs.shownList.find((item: any) => id === item.id);
+    dog = { ...dog, isFavorite };
+    const idx = dogs.shownList.findIndex((item: any) => id === item.id);
+    // const updatedShowList = [...dogs.shownList, dog];
+
+    const updatedDogs = [
+      ...dogs.shownList.slice(0, idx),
+      { ...dogs.shownList[idx], isFavorite },
+      ...dogs.shownList.slice(idx + 1),
+    ];
+    setDogs({ ...dogs, shownList: updatedDogs || [] });
+  };
+
   return {
     dogs: dogs.shownList,
     breeds,
@@ -102,5 +143,7 @@ export const useSearch = () => {
     selectedBreed,
     setSelectedBreed,
     setSearchTerm,
+    sortResults,
+    toggleFavorite,
   };
 };
