@@ -1,6 +1,6 @@
 import React from 'react';
-import { UserContextProvider } from './contexts/UserContext';
 import LoginPage from './components/LoginPage';
+import { UserContextProvider } from './contexts/UserContext';
 
 const App: React.FC = () => {
   return (
