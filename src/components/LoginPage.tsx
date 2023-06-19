@@ -1,48 +1,34 @@
-// Import necessary modules
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useContext, useState } from 'react';
+import { UserContext } from '../contexts/UserContext';
 
-const LoginPage = () => {
-  // Set initial state for name and email
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+const LoginPage: React.FC = () => {
+    // Local state for input fields
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
 
-  // Function to handle form submission
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Login API Endpoint
-    const loginApiUrl = "https://frontend-take-home-service.fetch.com/auth/login";
-
-    try {
-      const response = await axios.post(loginApiUrl, { name, email }, { withCredentials: true });
-      
-      if (response.status === 200) {
-        console.log("Login Successful");
-      } else {
-        console.log("Login Failed");
-      }
-    } catch (error) {
-      console.error("An error occurred during login", error);
+    // Get the login function from UserContext
+    const userContext = useContext(UserContext);
+    
+    // On form submission
+    const onSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // If userContext is defined, call the login function
+        userContext?.login(name, email);
     }
-  };
-
-  return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <label>
-          Name:
-          <input type="text" value={name} onChange={e => setName(e.target.value)} required />
-        </label>
-        <label>
-          Email:
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-        </label>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-  );
-};
+    
+    return (
+        <form onSubmit={onSubmit}>
+            <label>
+                Name:
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+            </label>
+            <label>
+                Email:
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </label>
+            <button type="submit">Log in</button>
+        </form>
+    );
+}
 
 export default LoginPage;

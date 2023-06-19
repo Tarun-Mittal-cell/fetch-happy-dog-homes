@@ -1,8 +1,8 @@
 import React from 'react';
-import LoginPage from './components/LoginPage';
 import { UserContextProvider } from './contexts/UserContext';
+import LoginPage from './components/LoginPage';
 
-function App() {
+const App: React.FC = () => {
   return (
     <UserContextProvider>
       <div>
