@@ -1,4 +1,5 @@
 import { useLogin } from "./use-login";
+import './styles.css';
 
 export const Login = () => {
   const { email, setEmail, name, setName, onSubmit } = useLogin();

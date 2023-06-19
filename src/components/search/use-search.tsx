@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useRecoilState } from "recoil";
 import axios from "axios";
-import { getBreeds, searchDogs } from "../../api/dogs";
+import { matchSorter } from "match-sorter";
 import { breedState, dogsState } from "../../store";
 
 export const useSearch = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [dogs, setDogs] = useRecoilState(dogsState);
   const [breeds, setBreeds] = useRecoilState(breedState);
   // const [zipCodes, setZipCodes] = useState<string[]>([]);
@@ -28,7 +29,28 @@ export const useSearch = () => {
         withCredentials: true,
       })) as any;
 
-      setDogs(dogs?.data || []);
+      const dogsZipCodes = dogs?.data.map((dog: any) => dog.zip_code);
+      debugger;
+      const locations = (await axios({
+        method: "POST",
+        url: "https://frontend-take-home-service.fetch.com/locations",
+        data: dogsZipCodes,
+        withCredentials: true,
+      })) as any;
+
+      let idx = 0;
+      const mappedDogs = dogs.data.map((dog: any) => {
+        return {
+          ...dog,
+          location: locations.data[idx],
+        };
+      });
+
+      setDogs({
+        ...dogs,
+        fullList: mappedDogs || [],
+        shownList: mappedDogs || [],
+      });
     };
 
     //   setDogs(dogs?.data || []);
@@ -55,17 +77,30 @@ export const useSearch = () => {
     fetchBreedsAndZipCodes();
   }, []);
 
-  const handleSearch = async () => {
+  const handleSearch = (_searchTerm: string) => {
     // const searchResponse = await searchDogs({ breeds: [selectedBreed], zipCodes: [selectedZipCode] });
-    const searchResponse = await searchDogs(selectedBreed);
-    console.log(searchResponse); // Do something with search results
+    // const searchResponse = await searchDogs(selectedBreed);
+    // console.log(searchResponse); // Do something with search results
+
+    const searchResult = matchSorter(dogs.fullList, _searchTerm, {
+      keys: ["name", "breed", "location.city"],
+    });
+    console.log(searchResult);
+    if (searchResult?.length) {
+      setDogs({ ...dogs, shownList: searchResult || [] });
+    }
   };
 
+  useEffect(() => {
+    handleSearch(searchTerm);
+  }, [searchTerm]);
+
   return {
-    dogs,
+    dogs: dogs.shownList,
     breeds,
     handleSearch,
     selectedBreed,
     setSelectedBreed,
+    setSearchTerm,
   };
 };

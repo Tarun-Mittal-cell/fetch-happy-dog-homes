@@ -1,12 +1,24 @@
 import { useSearch } from "./use-search";
-import './styles.css';
+import "./styles.css";
 
 export const Search = () => {
-  const { dogs, breeds, handleSearch, selectedBreed, setSelectedBreed } =
-    useSearch();
-  
+  const {
+    dogs,
+    breeds,
+    handleSearch,
+    selectedBreed,
+    setSelectedBreed,
+    setSearchTerm,
+  } = useSearch();
+
   return (
     <div className="search-main-container">
+      <input
+        type="text"
+        onChange={(evt) => {
+          setSearchTerm(evt.target.value);
+        }}
+      />
       <select
         value={selectedBreed}
         onChange={(e) => setSelectedBreed(e.target.value)}
@@ -18,8 +30,8 @@ export const Search = () => {
         ))}
       </select>
 
-      <button onClick={handleSearch}>Search</button>
-      
+      {/* <button onClick={handleSearch}>Search</button> */}
+
       <div className="dogs-container">
         {dogs.map((dog, $index) => {
           return (
