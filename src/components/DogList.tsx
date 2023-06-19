@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getDogs, searchDogs } from '../api/dogs';
 
 interface Dog {

@@ -14,9 +14,8 @@ export const Search = () => {
             {breed}
           </option>
         ))}
-      </select>
-      
-
+      </select>  
+    
       <button onClick={handleSearch}>Search</button>
     </div>
   );

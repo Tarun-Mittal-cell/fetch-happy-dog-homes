@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { getBreeds, searchDogs } from "../../api/dogs";
 import { breedState } from "../../store";
+import axios from "axios";
 
 export const useSearch = () => {
   const [breeds, setBreeds] = useRecoilState(breedState);
@@ -10,12 +11,22 @@ export const useSearch = () => {
   // const [selectedZipCode, setSelectedZipCode] = useState('');
 
   useEffect(() => {
+    // /dogs
     const fetchBreedsAndZipCodes = async () => {
-      const breedsResponse = await getBreeds();
-      debugger;
-      // const zipCodesResponse = await getZipCodes();
+      const breeds = await axios({
+        method: "GET",
+        url: "https://frontend-take-home-service.fetch.com/dogs/breeds",
+        withCredentials: true,
+      });
+      const zipcodes = async () => {
+        const res = await axios({
+          method: "GET",
+          url: "https://frontend-take-home-service.fetch.com//locations/search",
+          withCredentials: true,
+        });
+      };
 
-      setBreeds(breedsResponse);
+      setBreeds(breeds?.data || []);
       // setZipCodes(zipCodesResponse);
     };
     fetchBreedsAndZipCodes();

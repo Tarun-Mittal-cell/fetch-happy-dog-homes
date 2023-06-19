@@ -6,10 +6,9 @@ import {
   Navigate,
 } from "react-router-dom";
 import { RecoilRoot } from "recoil";
-import LoginPage from "./components/LoginPage";
 import DogList from "./components/DogList";
 import { UserContextProvider, UserContext } from "./contexts/UserContext";
-import Search from "./components/Search";
+import { Login, Search } from "./components";
 
 const App: React.FC = () => {
   const { user } = React.useContext(UserContext);
@@ -19,14 +18,15 @@ const App: React.FC = () => {
       <UserContextProvider>
         <Router>
           <Routes>
-            <Route path="/" element={<LoginPage />} />
+            <Route path="/" element={<Login />} />
             <Route
               path="dogs"
               element={user ? <DogList /> : <Navigate to="/" />}
             />
             <Route
               path="search"
-              element={user ? <Search /> : <Navigate to="/" />}
+              // element={user ? <Search /> : <Navigate to="/" />}
+              element={<Search />}
             />
           </Routes>
         </Router>
