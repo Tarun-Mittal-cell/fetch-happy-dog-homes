@@ -1,23 +1,22 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import DogList from './components/DogList';
-import { UserContextProvider } from './contexts/UserContext';
+import { UserContextProvider, UserContext } from './contexts/UserContext';
 
 const App: React.FC = () => {
-  return (
-    <UserContextProvider>
-      <Router>
-        <div>
-          <h1>Dog website</h1>
-          <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/dogs" element={<DogList />} />
-          </Routes>
-        </div>
-      </Router>
-    </UserContextProvider>
-  );
+    const { user } = React.useContext(UserContext);
+
+    return (
+        <UserContextProvider>
+            <Router>
+                <Routes>
+                    <Route path="/" element={<LoginPage />} />
+                    <Route path="dogs" element={user ? <DogList /> : <Navigate to="/" />} />
+                </Routes>
+            </Router>
+        </UserContextProvider>
+    );
 }
 
 export default App;

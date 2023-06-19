@@ -1,40 +1,41 @@
-import React, { useContext, useState } from 'react';
-import { login } from '../api/auth';
+import React, { useState, useContext } from 'react';
+import api from '../api';
 import { UserContext } from '../contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const { setUser } = useContext(UserContext);
-    const navigate = useNavigate();
-
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-
-    const handleSubmit = async (event: React.FormEvent) => {
+    const [name, setName] = useState('')
+    
+    const onSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-
         try {
-            const response = await login(email, password);
-            setUser(response.data); 
-            navigate('/dogs'); 
+            const response = await api.post('/auth/login', { email, name });
+            if (response.status === 200) {
+                setUser(response.data.user);
+                console.log('User logged in ===', response);
+            } else {
+                console.error('Login failed');
+            }
         } catch (error) {
-            console.error(error);
+            console.error('An error occurred while logging in', error);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={onSubmit}>
             <label>
                 Email:
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </label>
             <label>
-                Password:
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                Name:
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
             </label>
-            <button type="submit">Log in</button>
+            <button type="submit">Log In</button>
         </form>
     );
-}
+};
 
 export default LoginPage;
